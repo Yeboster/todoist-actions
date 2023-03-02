@@ -1,9 +1,20 @@
 {
   "name": "todoist-actions",
   "version": "1.0.0",
+  "author": "Yeboster",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --minify --outfile=dist/index.js",
+    "dev": "nodemon --watch 'src/**' --ext 'ts,json' --exec 'ts-node src/index.ts'"
+  },
   "dependencies": {
-    "todoist": "^1.1.0"
+    "todoist": "^1.1.0",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.10",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
   }
 }
