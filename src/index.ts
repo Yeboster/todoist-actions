@@ -16,6 +16,11 @@ async function workFlow(client: TodoistClientType) {
   console.log('Done!\n')
 }
 
+async function recurrentSetTimout(callback: () => void, delay: number) {
+  await callback()
+  setTimeout(() => recurrentSetTimout(callback, delay), delay)
+}
+
 async function main() {
   if (process.env.TODOIST_API_KEY == null)
     throw new Error('TODOIST_API_KEY is not set')
@@ -24,7 +29,7 @@ async function main() {
   const client = Todoist(process.env.TODOIST_API_KEY)
 
   await workFlow(client)
-  setTimeout(async () => await workFlow(client), 5 * 60_000) // Every 5 minutes
+  recurrentSetTimout(async () => await workFlow(client), 5 * 60_000) // Every 5 minutes
 }
 
 main()
