@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      target: base
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+volumes:
+  node_modules:
