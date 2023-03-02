@@ -65,6 +65,22 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Update tag version
+        uses: grebois/kube-tools@v1.5.2
+        with:
+          yq: 4.19.1
+          command: |
+            echo "Update tag version to ${{ steps.version.outputs.version }}"
+            yq -i '.images[0].newTag = "${{ steps.version.outputs.version }}"' k8s/overlays/prod/kustomization.yaml
+
+      - name: Commit latest release version
+        run: |
+          git config --global user.name 'yeboster'
+          git config --global user.email 'bot@yeboster.com'
+          git add .
+          git commit -m "Update app version to ${{ steps.version.outputs.version }}"
+          git push
   deploy:
     needs: build_and_push
     name: Deploy
