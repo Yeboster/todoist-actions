@@ -17,8 +17,8 @@ FROM node:18-alpine as production
 
 WORKDIR /app
 
-COPY --from=builder package.json yarn.lock  /app/
+COPY --from=builder app/package.json app/yarn.lock  /app/
 RUN yarn install --frozen-lockfile --production
 
-COPY --from=builder dist/index.js /app
+COPY --from=builder app/dist/index.js /app
 CMD ["node", "index.js"]
