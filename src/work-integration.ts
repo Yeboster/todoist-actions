@@ -8,9 +8,8 @@ function getWorkProject(client: TodoistClientType) {
 }
 
 type getWorkItemsType = { itemsInWorkProject: TodoistTypes.Item[], itemsWithWorkLabel: TodoistTypes.Item[] }
-function getWorkItems(client: TodoistClientType, workProject = null): getWorkItemsType {
-  if (workProject === null) workProject = getWorkProject(client)
-  const itemsInWorkProject = client.items!.get().filter((item: { project_id: null; }) => item.project_id === workProject)
+function getWorkItems(client: TodoistClientType, workProjectId: string): getWorkItemsType {
+  const itemsInWorkProject = client.items!.get().filter((item: { project_id: null; }) => item.project_id === workProjectId)
   const itemsWithWorkLabel = client.items!.get().filter((item: { labels: string | string[]; }) => item.labels.includes('work'))
 
   return { itemsInWorkProject, itemsWithWorkLabel }
@@ -27,17 +26,18 @@ async function moveIntoWorkProject(client: TodoistClientType, items: any[], work
 
 async function addWorkLabel(client: TodoistClientType, items: any[], workLabel = 'work') {
   console.log('Add work label to items...')
-  await Promise.all(items.map(async (item: { labels: { includes: (arg0: string) => any; append: (arg0: string) => any; }; id: any; }) => {
+  await Promise.all(items.map(async (item: { labels: { includes: (arg0: string) => any; push: (arg0: string) => any; }; id: any; }) => {
+
     if (item.labels.includes(workLabel)) return
 
-    const updatedLabels = item.labels.append('work')
-    await client.items!.update({ id: item.id, labels: updatedLabels })
+    item.labels.push('work')
+    await client.items!.update({ id: item.id, labels: item.labels })
   }))
 }
 
 export async function normalizeWorkProject(client: TodoistClientType) {
   const workProject = getWorkProject(client)
-  const { itemsInWorkProject, itemsWithWorkLabel } = getWorkItems(client, workProject)
+  const { itemsInWorkProject, itemsWithWorkLabel } = getWorkItems(client, workProject.id)
 
   await moveIntoWorkProject(client, itemsWithWorkLabel, workProject.id)
   await addWorkLabel(client, itemsInWorkProject)
