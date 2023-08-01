@@ -1,6 +1,7 @@
 import { v9 as Todoist } from 'todoist'
+import ChecklistIntegration from './integrations/checklists-integration'
+import WorkIntegration from './integrations/work-integration'
 import { TodoistClientType } from './types'
-import WorkIntegration, { normalizeWorkProject } from './integrations/work-integration'
 
 async function syncClient(client: TodoistClientType) {
   await client.sync(['items', 'projects', 'labels'])
@@ -8,6 +9,7 @@ async function syncClient(client: TodoistClientType) {
 
 const integrations = [
   new WorkIntegration(),
+  new ChecklistIntegration()
 ]
 
 async function runWorkflows(client: TodoistClientType) {
