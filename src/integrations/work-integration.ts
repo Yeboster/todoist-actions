@@ -1,6 +1,6 @@
 import { TodoistV9Types as TodoistTypes } from 'todoist'
-import { TodoistClientType } from './types'
-import IIntegration from './integration';
+import { TodoistClientType } from '../types'
+import IIntegration from '../integration';
 
 function getWorkProject(client: TodoistClientType) {
   const workProject = client.projects!.get().find((project: { name: string; }) => project.name.toLowerCase() === 'work')

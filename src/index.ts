@@ -1,6 +1,6 @@
 import { v9 as Todoist } from 'todoist'
 import { TodoistClientType } from './types'
-import WorkIntegration, { normalizeWorkProject } from './work-integration'
+import WorkIntegration, { normalizeWorkProject } from './integrations/work-integration'
 
 async function syncClient(client: TodoistClientType) {
   await client.sync(['items', 'projects', 'labels'])
