@@ -1,5 +1,6 @@
 import { TodoistV9Types as TodoistTypes } from 'todoist'
 import { TodoistClientType } from './types'
+import IIntegration from './integration';
 
 function getWorkProject(client: TodoistClientType) {
   const workProject = client.projects!.get().find((project: { name: string; }) => project.name.toLowerCase() === 'work')
@@ -41,4 +42,14 @@ export async function normalizeWorkProject(client: TodoistClientType) {
 
   await moveIntoWorkProject(client, itemsWithWorkLabel, workProject.id)
   await addWorkLabel(client, itemsInWorkProject)
+}
+
+export default class WorkIntegration implements IIntegration {
+  get name() {
+    return 'Work'
+  }
+
+  async run(client: TodoistClientType) {
+    await normalizeWorkProject(client)
+  }
 }
