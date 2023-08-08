@@ -10,42 +10,50 @@ export default class WorkIntegration implements IIntegration {
   }
 
   async run(client: TodoistClientType) {
-    const workProject = this.getWorkProject(client)
-    const { itemsInWorkProject, itemsWithWorkLabel } = this.getWorkItems(client, workProject.id)
+    const parentWorkProject = this.getWorkProject(client)
+    const workProjectChildrenIds = this.getWorkProjectChildren(client, parentWorkProject).map((project) => project.id)
+    const workProjectsId = [parentWorkProject.id, ...workProjectChildrenIds]
+    const { itemsInWorkProject, itemsWithWorkLabel } = this.getWorkItems(client, workProjectsId)
 
-    await this.moveIntoWorkProject(client, itemsWithWorkLabel, workProject.id)
+    await this.moveIntoWorkProject(client, itemsWithWorkLabel, workProjectsId, parentWorkProject.id)
     await this.addWorkLabel(client, itemsInWorkProject)
   }
 
+  private get workLabel() {
+    return 'work'
+  }
+
+  private getWorkProjectChildren(client: TodoistClientType, parentWorkProject: any) {
+    return client.projects!.get().filter((project: { parent_id: string; }) => project.parent_id === parentWorkProject.id);
+  }
+
   getWorkProject(client: TodoistClientType) {
-    const workProject = client.projects!.get().find((project: { name: string; }) => project.name.toLowerCase() === 'work')
+    const workProject = client.projects!.get().find((project: { name: string; }) => project.name.toLowerCase() === this.workLabel)
 
     return workProject
   }
 
-  getWorkItems(client: TodoistClientType, workProjectId: string): getWorkItemsType {
-    const itemsInWorkProject = client.items!.get().filter((item: { project_id: null; }) => item.project_id === workProjectId)
-    const itemsWithWorkLabel = client.items!.get().filter((item: { labels: string | string[]; }) => item.labels.includes('work'))
+  getWorkItems(client: TodoistClientType, workProjectIds: string[]): getWorkItemsType {
+    const itemsInWorkProject = client.items!.get().filter((item: { project_id: string | null; }) => item.project_id && workProjectIds.includes(item.project_id))
+    const itemsWithWorkLabel = client.items!.get().filter((item: { labels: string | string[]; }) => item.labels.includes(this.workLabel))
 
     return { itemsInWorkProject, itemsWithWorkLabel }
   }
 
-  async moveIntoWorkProject(client: TodoistClientType, items: any[], workProjectId: any) {
-    console.log('Moving items into work project...')
+  async moveIntoWorkProject(client: TodoistClientType, items: any[], workProjectsId: string[], workProjectId: any) {
     await Promise.all(items.map(async (item: { project_id: any; id: any; }) => {
-      if (item.project_id === workProjectId) return
+      if (workProjectsId.includes(item.project_id)) return
 
       await client.items!.move({ id: item.id, project_id: workProjectId })
     }))
   }
 
-  async addWorkLabel(client: TodoistClientType, items: any[], workLabel = 'work') {
-    console.log('Add work label to items...')
+  async addWorkLabel(client: TodoistClientType, items: any[]) {
     await Promise.all(items.map(async (item: { labels: { includes: (arg0: string) => any; push: (arg0: string) => any; }; id: any; }) => {
 
-      if (item.labels.includes(workLabel)) return
+      if (item.labels.includes(this.workLabel)) return
 
-      item.labels.push('work')
+      item.labels.push(this.workLabel)
       await client.items!.update({ id: item.id, labels: item.labels })
     }))
   }
