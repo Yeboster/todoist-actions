@@ -2,9 +2,9 @@ import { TodoistApi } from "@doist/todoist-api-typescript";
 import IIntegration from "../integration";
 import { TodoistClientType } from "../types";
 
-export default class SmartScheduleIntegration implements IIntegration {
+export default class ScheduleDateFromComment implements IIntegration {
   get name() {
-    return "Smart Schedule"
+    return "Schedule date from comment"
   }
 
   // Schedule tasks with due date and comments

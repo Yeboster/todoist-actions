@@ -4,12 +4,12 @@ import { TodoistApi } from '@doist/todoist-api-typescript'
 import ChecklistIntegration from './integrations/checklists-integration'
 import WorkIntegration from './integrations/work-integration'
 import { TodoistClientType } from './types'
-import SmartScheduleIntegration from './integrations/smart-schedule-integration'
+import ScheduleDateFromComment from './integrations/schedule-date-from-comment-integration'
 
 const integrations = [
   new WorkIntegration(),
-  new ChecklistIntegration()
-  new SmartScheduleIntegration()
+  new ChecklistIntegration(),
+  new ScheduleDateFromComment()
 ]
 
 async function runWorkflows(syncClient: TodoistClientType, client: TodoistApi) {
