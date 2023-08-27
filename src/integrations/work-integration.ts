@@ -1,6 +1,7 @@
 import { TodoistV9Types as TodoistTypes } from 'todoist'
 import { TodoistClientType } from '../types'
 import IIntegration from '../integration';
+import { TodoistApi } from '@doist/todoist-api-typescript';
 
 type getWorkItemsType = { itemsInWorkProject: TodoistTypes.Item[], itemsWithWorkLabel: TodoistTypes.Item[] }
 
@@ -9,14 +10,14 @@ export default class WorkIntegration implements IIntegration {
     return 'Work'
   }
 
-  async run(client: TodoistClientType) {
-    const parentWorkProject = this.getWorkProject(client)
-    const workProjectChildrenIds = this.getWorkProjectChildren(client, parentWorkProject).map((project) => project.id)
+  async run(syncClient: TodoistClientType, restClient: TodoistApi) {
+    const parentWorkProject = this.getWorkProject(syncClient)
+    const workProjectChildrenIds = this.getWorkProjectChildren(syncClient, parentWorkProject).map((project) => project.id)
     const workProjectsId = [parentWorkProject.id, ...workProjectChildrenIds]
-    const { itemsInWorkProject, itemsWithWorkLabel } = this.getWorkItems(client, workProjectsId)
+    const { itemsInWorkProject, itemsWithWorkLabel } = this.getWorkItems(syncClient, workProjectsId)
 
-    await this.moveIntoWorkProject(client, itemsWithWorkLabel, workProjectsId, parentWorkProject.id)
-    await this.addWorkLabel(client, itemsInWorkProject)
+    await this.moveIntoWorkProject(syncClient, itemsWithWorkLabel, workProjectsId, parentWorkProject.id)
+    await this.addWorkLabel(syncClient, itemsInWorkProject)
   }
 
   private get workLabel() {
