@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@doist/todoist-api-typescript": "^2.1.2",
+    "chrono-node": "^2.6.5",
     "todoist": "^1.1.0",
     "typescript": "^4.9.5"
   },
