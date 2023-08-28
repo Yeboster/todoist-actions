@@ -12,8 +12,7 @@ export default class ScheduleDateFromComment implements IIntegration {
   // Schedule tasks with due date and comments
   // Given a comment with the following date format (e.g. Sep 06 @ 1:15 PM)
   async run(syncClient: TodoistClientType, restClient: TodoistApi) {
-    // const tasksWithDateAndLabel = await restClient.getTasks({ filter: '!no date & !recurring & !no labels' })
-    const tasksWithDateAndLabel = await restClient.getTasks({ ids: ['7162630030'] })
+    const tasksWithDateAndLabel = await restClient.getTasks({ filter: '!no date & !recurring & !no labels' })
 
     const tasksWithDueDateAndComment = tasksWithDateAndLabel.filter((task) => task.commentCount > 0)
 
@@ -34,11 +33,22 @@ export default class ScheduleDateFromComment implements IIntegration {
       const newDueDate = datePatternMatch[0].replace('@', '')
 
       const parsedDate = chrono.parseDate(newDueDate)
+      parsedDate.setMinutes(parsedDate.getMinutes() + this.defaultTaskDurationInMinutes)
+      const formattedDate = this.formatDate(parsedDate)
+
       const taskDueDate = chrono.parseDate(task.due?.string ?? '')
 
-      if (parsedDate.toISOString() === taskDueDate.toISOString()) continue
+      if (formattedDate === this.formatDate(taskDueDate)) continue
 
-      await restClient.updateTask(task.id, { dueString: newDueDate })
+      await restClient.updateTask(task.id, { dueString: formattedDate })
     }
+  }
+
+  get defaultTaskDurationInMinutes() {
+    return 45
+  }
+
+  formatDate(date: Date) {
+    return date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   }
 }
