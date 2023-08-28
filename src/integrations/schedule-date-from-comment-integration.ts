@@ -1,6 +1,8 @@
-import { TodoistApi } from "@doist/todoist-api-typescript";
-import IIntegration from "../integration";
-import { TodoistClientType } from "../types";
+import { TodoistApi } from "@doist/todoist-api-typescript"
+import IIntegration from "../integration"
+import { TodoistClientType } from "../types"
+
+import * as chrono from 'chrono-node'
 
 export default class ScheduleDateFromComment implements IIntegration {
   get name() {
@@ -10,7 +12,8 @@ export default class ScheduleDateFromComment implements IIntegration {
   // Schedule tasks with due date and comments
   // Given a comment with the following date format (e.g. Sep 06 @ 1:15 PM)
   async run(syncClient: TodoistClientType, restClient: TodoistApi) {
-    const tasksWithDateAndLabel = await restClient.getTasks({ filter: '!no date & !recurring & !no labels' })
+    // const tasksWithDateAndLabel = await restClient.getTasks({ filter: '!no date & !recurring & !no labels' })
+    const tasksWithDateAndLabel = await restClient.getTasks({ ids: ['7162630030'] })
 
     const tasksWithDueDateAndComment = tasksWithDateAndLabel.filter((task) => task.commentCount > 0)
 
@@ -28,7 +31,12 @@ export default class ScheduleDateFromComment implements IIntegration {
       const datePatternMatch = commentWithDatePattern.content.match(datePattern)
       if (datePatternMatch == null) continue
 
-      const newDueDate = datePatternMatch[0]
+      const newDueDate = datePatternMatch[0].replace('@', '')
+
+      const parsedDate = chrono.parseDate(newDueDate)
+      const taskDueDate = chrono.parseDate(task.due?.string ?? '')
+
+      if (parsedDate.toISOString() === taskDueDate.toISOString()) continue
 
       await restClient.updateTask(task.id, { dueString: newDueDate })
     }
