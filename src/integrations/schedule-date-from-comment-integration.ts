@@ -14,7 +14,7 @@ export default class ScheduleDateFromComment implements IIntegration {
   async run(syncClient: TodoistClientType, restClient: TodoistApi) {
     const tasksWithDateAndLabel = await restClient.getTasks({ filter: '!no date & !recurring & !no labels' })
 
-    const tasksWithDueDateAndComment = tasksWithDateAndLabel.filter((task) => task.commentCount > 0)
+    const tasksWithDueDateAndComment = tasksWithDateAndLabel.filter((task) => !task.isCompleted && task.commentCount > 0)
 
     for (const task of tasksWithDueDateAndComment) {
       const comments = await restClient.getComments({ taskId: task.id })
