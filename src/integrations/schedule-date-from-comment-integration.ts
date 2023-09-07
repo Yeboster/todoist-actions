@@ -40,6 +40,10 @@ export default class ScheduleDateFromComment implements IIntegration {
 
       if (formattedDate === this.formatDate(taskDueDate)) continue
 
+      // Add guard to prevent updating tasks that have been completed
+      const refetchedTask = await restClient.getTask(task.id)
+      if (refetchedTask.isCompleted) continue
+
       await restClient.updateTask(task.id, { dueString: formattedDate })
     }
   }
