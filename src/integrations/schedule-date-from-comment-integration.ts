@@ -19,8 +19,8 @@ export default class ScheduleDateFromComment implements IIntegration {
     for (const task of tasksWithDueDateAndComment) {
       const comments = await restClient.getComments({ taskId: task.id })
 
-      // Matches the following format Sep 06 @ 1:15 PM)
-      const datePattern = /((\w|\s)+@\s.*(AM|PM))/g
+      // Matches the following format Sep 06 @ 1:15 PM & sept. 15 @ 10:00
+      const datePattern = /((.+)+@\s.*(AM|PM)?)/g
       const commentsWithDatePattern = comments.filter((comment) => datePattern.test(comment.content))
 
       if (commentsWithDatePattern.length === 0) continue
