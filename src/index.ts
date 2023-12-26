@@ -11,15 +11,21 @@ const integrations = [
 ]
 
 async function runWorkflows(syncClient: TodoistClientType, client: TodoistApi) {
-  console.log('Syncing with Todoist...')
-  await syncClient.sync(['items', 'projects', 'labels'])
+  let hasError = false
+  try {
+    console.log('Syncing with Todoist...')
+    await syncClient.sync(['items', 'projects', 'labels'])
 
-  for (const integration of integrations) {
-    console.log(`Running '${integration.name}' integration...`)
-    await integration.run(syncClient, client)
+    for (const integration of integrations) {
+      console.log(`Running '${integration.name}' integration...`)
+      await integration.run(syncClient, client)
+    }
+  } catch (error) {
+    console.error('Got error: ', error)
+    hasError = true
   }
 
-  console.log('Done!\n')
+  if (!hasError) console.log('Done!\n')
 }
 
 async function recurrentSetTimout(callback: () => void, delay: number) {
