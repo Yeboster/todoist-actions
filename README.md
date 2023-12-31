@@ -1,4 +1,8 @@
-# Todoist Workflow Enhancements
+# Todoist Actions
+
+![todoist-actions](https://github.com/Yeboster/todoist-actions/assets/23556525/e1c3b98a-f391-45b2-86d5-e1b23e131288)
+
+
 This is a compilation of my custom workflows using the Todoist API, designed to boost my everyday productivity.
 
 Each workflow is designed to operate with the following Todoist clients:
