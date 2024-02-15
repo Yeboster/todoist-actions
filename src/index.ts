@@ -42,7 +42,7 @@ async function main() {
   const restClient = new TodoistApi(process.env.TODOIST_API_KEY)
 
   await runWorkflows(syncClient, restClient)
-  recurrentSetTimout(async () => await runWorkflows(syncClient, restClient), 5 * 60_000) // Every 5 minutes
+  recurrentSetTimout(async () => await runWorkflows(syncClient, restClient), 10 * 60_000) // Every 10 minutes
 }
 
 main()
