@@ -18,8 +18,10 @@ export default class ChecklistIntegration implements IIntegration {
     const checklistTasks = childProjects.map((project: { id: string; }) => syncClient.items!.get().filter((item: { project_id: string; }) => item.project_id === project.id)).flat()
 
     // Remove due date from all tasks
-    await Promise.all(checklistTasks.map(async (task: { id: string; }) => {
+    for (const task of checklistTasks) {
+      if (task.due === null) continue
+
       await syncClient.items!.update({ id: task.id, due: null })
-    }))
+    }
   }
 }
