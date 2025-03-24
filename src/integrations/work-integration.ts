@@ -5,13 +5,16 @@ import { TodoistApi, Task } from '@doist/todoist-api-typescript';
 type getWorkItemsType = { tasksInWorkProject: Task[], tasksWithWorkLabel: Task[] }
 
 export default class WorkIntegration implements IIntegration {
+  WORK_PROJECT = 'Work'
+  MAIN_WORK_LABEL = 'work'
+  WORK_LABELS = ['work', 'w']
   get name() {
     return 'Work'
   }
 
   async run(syncClient: TodoistClientType, restClient: TodoistApi) {
     const projects = await restClient.getProjects()
-    const parentWorkProject = projects.find((project) => project.name.toLowerCase() === this.workLabel)
+    const parentWorkProject = projects.find((project) => project.name.toLowerCase() === this.WORK_PROJECT)
     if (parentWorkProject == null) return
 
     const workProjectChildren = projects.filter((project) => project.parentId === parentWorkProject.id)
@@ -22,16 +25,12 @@ export default class WorkIntegration implements IIntegration {
     await this.moveIntoWorkProject(syncClient, tasksWithWorkLabel, workProjects.map((project) => project.id), parentWorkProject.id)
     await this.addWorkLabel(syncClient, tasksInWorkProject)
   }
-
-  private get workLabel() {
-    return 'work'
-  }
-
+  
   async getWorkItems(client: TodoistApi, workProjectNames: string[]): Promise<getWorkItemsType> {
     const workProjectsFilter = workProjectNames.map((name) => `#${name}`).join(' | ')
 
     const tasksInWorkProject = await client.getTasks({ filter: workProjectsFilter })
-    const tasksWithWorkLabel = await client.getTasks({ filter: `@${this.workLabel}` })
+    const tasksWithWorkLabel = await client.getTasks({ filter: `@${this.WORK_LABELS.join('|@')}` })
 
     return { tasksInWorkProject, tasksWithWorkLabel }
   }
@@ -47,9 +46,9 @@ export default class WorkIntegration implements IIntegration {
   async addWorkLabel(client: TodoistClientType, tasks: Task[]) {
     await Promise.all(tasks.map(async (task) => {
 
-      if (task.labels.includes(this.workLabel)) return
+      if (task.labels.includes(this.MAIN_WORK_LABEL)) return
 
-      task.labels.push(this.workLabel)
+      task.labels.push(this.MAIN_WORK_LABEL)
       await client.items!.update({ id: task.id, labels: task.labels })
     }))
   }
