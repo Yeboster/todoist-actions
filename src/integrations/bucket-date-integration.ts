@@ -33,6 +33,7 @@ export class BucketDateIntegration implements IIntegration {
     return {
       'this-week': this.formatDateToMilitaryFormat(endOfWeek),
       'this-month': this.formatDateToMilitaryFormat(endOfMonth),
+      'next-month': this.formatDateToMilitaryFormat(endOfMonth),
       'this-quarter': this.formatDateToMilitaryFormat(endOfQuarter),
     }
   }
