@@ -5,7 +5,7 @@ import { TodoistApi, Task } from '@doist/todoist-api-typescript';
 type getWorkItemsType = { tasksInWorkProject: Task[], tasksWithWorkLabel: Task[] }
 
 export default class WorkIntegration implements IIntegration {
-  WORK_PROJECT = 'Work'
+  WORK_PROJECT = 'work'
   MAIN_WORK_LABEL = 'work'
   WORK_LABELS = ['work', 'w']
   get name() {
