@@ -44,11 +44,12 @@ export default class WorkIntegration implements IIntegration {
   }
 
   async addWorkLabel(client: TodoistClientType, tasks: Task[]) {
+    const shortcutLabels = this.WORK_LABELS.filter((label) => label !== this.MAIN_WORK_LABEL)
     await Promise.all(tasks.map(async (task) => {
-
-      if (task.labels.includes(this.MAIN_WORK_LABEL)) return
+      if (!task.labels.find(l => shortcutLabels.includes(l))) return
 
       task.labels.push(this.MAIN_WORK_LABEL)
+      task.labels = task.labels.filter((label) => !shortcutLabels.includes(label))
       await client.items!.update({ id: task.id, labels: task.labels })
     }))
   }
