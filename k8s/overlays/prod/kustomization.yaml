@@ -6,6 +6,6 @@ bases:
 images:
   - name: app-image
     newName: yeboster/todoist-actions
-    newTag: "1747575203"
+    newTag: "1747577269"
 resources:
   - secrets/app.sops.yaml
