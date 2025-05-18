@@ -88,4 +88,4 @@ jobs:
     steps:
       - name: Trigger deploy
         run: |
-          curl https://receiver.yeboster.com/hook/${{ secrets.WEBHOOK_PATH }}
+          curl ${{ secrets.WEBHOOK_URL }}
